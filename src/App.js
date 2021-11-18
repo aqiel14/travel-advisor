@@ -4,7 +4,7 @@ import Map from './components/Map/Map';
 import List from './components/List/List';
 import { CssBaseline, Grid } from '@material-ui/core';
 
-import { getPlacesData } from './api';
+import { getPlacesData, getWeatherData } from './api';
 
 const App = () => {
   const [places, setPlaces] = useState([]);
@@ -20,6 +20,8 @@ const App = () => {
   const [rating, setRating] = useState('');
 
   const [filteredPlaces, setFilteredPlaces] = useState([]);
+
+  const [weatherData, setWeatherData] = useState([]);
 
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
@@ -38,6 +40,10 @@ const App = () => {
   useEffect(() => {
     if (bounds.sw && bounds.ne) {
       setIsLoading(true);
+      getWeatherData(coordinates.lat, coordinates.lng).then((data) =>
+        setWeatherData(data)
+      );
+
       getPlacesData(type, bounds.sw, bounds.ne).then((data) => {
         setPlaces(data?.filter((place) => place.name && place.num_reviews > 0));
         setFilteredPlaces([]);
@@ -68,6 +74,7 @@ const App = () => {
             coordinates={coordinates}
             places={filteredPlaces.length ? filteredPlaces : places}
             setChildClicked={setChildClicked}
+            weatherData={weatherData}
           />
         </Grid>
       </Grid>
